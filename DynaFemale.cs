@@ -47,7 +47,7 @@ namespace PH_DynaUncensor
 
         
 
-        private void Start()
+        private void Awake()
         {
             female = this.GetComponent<Female>();
             if (female == null)

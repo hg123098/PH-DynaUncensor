@@ -17,7 +17,7 @@ namespace PH_DynaUncensor
         private HashSet<DynamicBoneCollider> DynaCollHand = new HashSet<DynamicBoneCollider>();
 
 
-        private void Start()
+        private void Awake()
         {
             AnimBoneRoot = this.transform.Find("p_cm_anim/cm_J_Root").gameObject;
 
@@ -35,6 +35,13 @@ namespace PH_DynaUncensor
             foreach(DynaFemale female in females)
             {
                 female.SetupBodyDynamicBones();
+            }
+
+
+            Transform[] transforms = this.GetComponentsInChildren<Transform>(true);
+            foreach (Transform child in transforms)
+            {
+                if (child.name == "cm_J_Root" && child.parent.name != "p_cm_anim") Destroy(child.gameObject);
             }
         }
 

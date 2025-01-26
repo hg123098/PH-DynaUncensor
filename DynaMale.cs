@@ -21,6 +21,11 @@ namespace PH_DynaUncensor
         {
             AnimBoneRoot = this.transform.Find("p_cm_anim/cm_J_Root").gameObject;
 
+            foreach (DynamicBoneCollider collider in AnimBoneRoot.GetComponentsInChildren<DynamicBoneCollider>())
+            {
+                DynaCollMale.Add(collider);
+            }
+
             AddDynaCollTin();
             AddDynaCollTang();
             AddDynaCollHand();

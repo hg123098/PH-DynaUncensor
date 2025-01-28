@@ -23,7 +23,7 @@ namespace PH_DynaUncensor
     {
         internal const string GUID = "HG.DynaUncensor";
         internal const string PluginName = "PH DynaUncensor";
-        internal const string VERSION = "1.0";
+        internal const string VERSION = "1.1";
 
         internal const int OreoVer = 495;
 
@@ -52,6 +52,8 @@ namespace PH_DynaUncensor
             [HarmonyPostfix, HarmonyPatch(typeof(Wears), nameof(Wears.ChangeBodyMaterial))]
             private static void SyncBodySkin(Renderer bodySkin, Human ___human)
             {
+                if (___human == null) return;                                                       //의상카드 생성 시에는 ___human이 NULL
+
                 DynaFemale UIfemale = ___human.GetComponent<DynaFemale>();
                 if (UIfemale != null) UIfemale.SyncBodySkin(bodySkin);
             }
@@ -101,7 +103,7 @@ namespace PH_DynaUncensor
             [HarmonyPrefix, HarmonyPatch(typeof(Body), nameof(Body.ChangeUnderHair))]
             private static void UnderHairExtend(Human ___human, Renderer ___rend_underhair)
             {
-                if (___human.sex != SEX.FEMALE) return;
+                if (___human == null || ___human.sex != SEX.FEMALE) return;
 
                 BodyParameter body = ___human.customParam.body;
                 UnderhairData underhair = CustomDataManager.GetUnderhair(body.underhairID);
@@ -127,6 +129,8 @@ namespace PH_DynaUncensor
             [HarmonyPostfix, HarmonyPatch(typeof(Body), nameof(Body.ChangeUnderHairColor))]
             private static void ChangeUnderHairColorExtend(Human ___human, Renderer ___rend_underhair)
             {
+                if (___human == null) return;
+
                 BodyParameter body = ___human.customParam.body;
                 Transform Phair = Transform_Utility.FindTransform(___rend_underhair.transform.parent, "Phair" + OreoVer.ToString());
                 if (Phair != null && Phair.gameObject.activeSelf)
@@ -142,7 +146,7 @@ namespace PH_DynaUncensor
             [HarmonyPostfix, HarmonyPatch(typeof(Body), nameof(Body.ShowUnderHair3D))]
             private static void ShowUnderHair3DExtend(bool show, Human ___human, Renderer ___rend_underhair)
             {
-                if (___human.sex == SEX.MALE) return;
+                if (___human == null || ___human.sex == SEX.MALE) return;
 
                 BodyParameter body = ___human.customParam.body;
                 UnderhairData underhair = CustomDataManager.GetUnderhair(body.underhairID);
@@ -160,6 +164,8 @@ namespace PH_DynaUncensor
             [HarmonyPrefix, HarmonyPatch(typeof(WearCustomEdit), "ChangeOnWear")]
             private static bool ChangeOnWearOneTypeOnly(WEAR_TYPE wear, int id, WearCustomEdit __instance, Human ___human)
             {
+                if (___human == null) return true;
+
                 ___human.customParam.wear.wears[(int)wear].id = id;
                 ___human.customParam.wear.wears[(int)wear].color = null;
                 MaterialCustomData.GetWear(wear, ___human.customParam.wear.wears[(int)wear]);
@@ -291,13 +297,6 @@ namespace PH_DynaUncensor
             {
                 if(part == IK_Data.PART.TIN) DestroyDynaPenetration(___fbik);
             }
-
-            [HarmonyPrefix, HarmonyPatch(typeof(H_Item), nameof(H_Item.SetTarget))]
-            private static bool ReleaseIKitem()
-            {
-                return true;
-            }
-
         }
 
         private class HumanLoadFix
